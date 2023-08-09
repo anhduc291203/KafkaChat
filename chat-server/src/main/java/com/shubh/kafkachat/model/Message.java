@@ -5,6 +5,8 @@ public class Message {
     private String content;
     private String timestamp;
 
+    private long sendtime;
+
     public Message() {
     }
 
@@ -44,5 +46,13 @@ public class Message {
                 ", content='" + content + '\'' +
                 ", timestamp='" + timestamp + '\'' +
                 '}';
+    }
+
+    public long getSendtime() {
+        return sendtime;
+    }
+
+    public void setSendtime(long sendtime) {
+        this.sendtime = sendtime;
     }
 }
