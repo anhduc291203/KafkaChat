@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @SpringBootApplication
@@ -17,22 +20,28 @@ public class KafkaJavaApp {
     public static void main(String[] args) {
         SpringApplication.run(KafkaJavaApp.class, args);
     }
+
     @Bean
-    CommandLineRunner commandLineRunner(KafkaTemplate<String, Message> kafkaTemplate){
+    CommandLineRunner commandLineRunner(KafkaTemplate<String, Message> kafkaTemplate) {
         return args -> {
-            for (int i = 0; i < 1000; i++) {
-                try {
-                    //Sending the message to kafka topic queu   e
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+            for (int i = 0; i < 10000; i++) {
+                final int index = i;
+                CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                     Message message = new Message();
-                    message.setSender(0 + i);
+                    message.setSender(index);
                     message.setContent("10");
                     message.setTimestamp(LocalDateTime.now().toString());
                     message.setSendtime(System.currentTimeMillis());
-                    kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, message).get();
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
+                    kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, message);
+                });
+
+                futures.add(future);
             }
+
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            allOf.join();
         };
     }
 }

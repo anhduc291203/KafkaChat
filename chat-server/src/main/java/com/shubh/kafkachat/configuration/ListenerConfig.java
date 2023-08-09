@@ -40,6 +40,7 @@ public class ListenerConfig {
         configurations.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configurations.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         configurations.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        configurations.put("max.partition.fetch.bytes", 20971520);
         return configurations;
     }
 }
